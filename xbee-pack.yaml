@@ -1,0 +1,34 @@
+schema-version: 1.0
+
+type: builder
+
+description: |
+  The Asciidoc package is a text document format for writing notes, documentation, articles, books, ebooks, slideshows, web pages, man pages and blogs. AsciiDoc files can be translated to many formats including HTML, PDF, EPUB, and man page.
+
+  Installed Programs: a2x (symlink to a2x.py), a2x.py, asciidoc (symlink to asciidoc.py), and asciidoc.py
+  Installed Libraries: None
+  Installed Directories: /etc/asciidoc and /usr/share/doc/asciidoc-9.1.0
+  Short Descriptions
+    a2x: is a toolchain manager for AsciiDoc (converts Asciidoc text files to other file formats)
+    asciidoc: converts an AsciiDoc text file to HTML or DocBook
+
+in:
+  version: "9.1.0"
+
+provision:
+  - url:
+      from: https://github.com/asciidoc/asciidoc-py3/releases/download/{% version %}/asciidoc-{% version %}.tar.gz
+      todir: "{% xbeeSrc %}"
+
+build:
+  - shell:
+      cmds:
+        - sed -i 's:doc/testasciidoc.1::' Makefile.in
+        - rm doc/testasciidoc.1.txt
+        - ./configure --prefix=/usr --sysconfdir=/etc --docdir=/usr/share/doc/asciidoc-{% version %}
+        - make
+        - make install DESTDIR={% xbeeOut %}
+        - make docs DESTDIR={% xbeeOut %}
+      directory: "{% xbeeSrc %}/asciidoc-{% version %}"
+
+
